@@ -1,0 +1,130 @@
+NORMALIZATION ANALYSIS (UP TO 3NF)
+=================================================
+
+1. ENTITY SETS & RELATIONSHIP SETS
+---------------------------------
+
+ENTITY SETS:
+- User(User_ID, Full_Name, Email, Phone, Password, Status)
+- Customer(User_ID)
+- Admin(User_ID)
+- Address(Address_ID, Address_Line, City, State_Region, Postal_Code, Country)
+- Warehouse(Warehouse_ID, Name, Address_ID, Phone, Email)
+- Category(Category_ID, Category_Name, Parent_Category_ID)
+- Brand(Brand_ID, Brand_Name)
+- Product(Product_ID, Brand_ID, Product_Name, Description)
+- ProductVariant(Product_Variant_ID, Product_ID, SKU, Color, Size, Material, Unit_Price, Discount_Percent, Tax_Percent)
+- Supplier(Supplier_ID, Supplier_Name, Email)
+- PurchaseOrder(PO_ID, Supplier_ID, Created_By_Admin_ID, Status, Order_Date)
+- GoodsReceipt(Receipt_ID, PO_ID, Warehouse_ID, Receipt_Date)
+- Cart(Cart_ID, User_ID, Status, Created_at, Updated_at)
+- Order(Order_ID, User_ID, Address_ID, Order_Status, Subtotal_Amount, Tax_Amount, Shipping_Fee, Total_Amount, Created_at, Updated_at)
+- Bill(Bill_ID, Order_ID, Bill_Number, Issue_Date, Due_Date, Bill_Status, Total_Amount)
+- Payment(Payment_ID, Order_ID, Amount, Method, Status, Transaction_Reference, Processed_At, Paid_At)
+
+RELATIONSHIP SETS:
+- ProductCategory(Product_ID, Category_ID)
+- Inventory(Warehouse_ID, Product_Variant_ID, On_Hand_Quantity, Reorder_Level)
+- StockMovement(Movement_ID, Warehouse_ID, Product_Variant_ID, Quantity_Change, Movement_Type, Reference_Type, Reference_ID, Movement_Date)
+- CartItem(Cart_ID, Product_Variant_ID, Quantity, Unit_Price)
+- OrderItem(Order_Item_ID, Order_ID, Product_Variant_ID, Quantity, Unit_Price, Discount_Percent, Tax_Percent)
+- Phone_Supplier(Supplier_ID, Phone)
+- PurchaseOrderItem(PO_ID, Product_Variant_ID, Quantity_Ordered, Unit_Cost)
+- GoodsReceiptItem(Receipt_ID, Product_Variant_ID, Quantity_Received, Unit_Cost)
+
+
+2. FUNCTIONAL DEPENDENCIES
+--------------------------
+
+User:
+User_ID -> Full_Name, Email, Phone, Password, Status
+Email -> User_ID
+
+Address:
+Address_ID -> Address_Line, City, State_Region, Postal_Code, Country
+
+Warehouse:
+Warehouse_ID -> Name, Address_ID, Phone, Email
+
+Category:
+Category_ID -> Category_Name, Parent_Category_ID
+
+Brand:
+Brand_ID -> Brand_Name
+
+Product:
+Product_ID -> Brand_ID, Product_Name, Description
+
+ProductVariant:
+Product_Variant_ID -> Product_ID, SKU, Color, Size, Material, Unit_Price, Discount_Percent, Tax_Percent
+SKU -> Product_Variant_ID
+
+Inventory:
+(Warehouse_ID, Product_Variant_ID) -> On_Hand_Quantity, Reorder_Level
+
+Cart:
+Cart_ID -> User_ID, Status, Created_at, Updated_at
+
+CartItem:
+(Cart_ID, Product_Variant_ID) -> Quantity, Unit_Price
+
+Order:
+Order_ID -> User_ID, Address_ID, Order_Status, Subtotal_Amount, Tax_Amount, Shipping_Fee, Total_Amount, Created_at, Updated_at
+
+OrderItem:
+Order_Item_ID -> Order_ID, Product_Variant_ID, Quantity, Unit_Price, Discount_Percent, Tax_Percent
+
+Bill:
+Bill_ID -> Order_ID, Bill_Number, Issue_Date, Due_Date, Bill_Status, Total_Amount
+Bill_Number -> Bill_ID
+
+Payment:
+Payment_ID -> Order_ID, Amount, Method, Status, Transaction_Reference, Processed_At, Paid_At
+
+Supplier:
+Supplier_ID -> Supplier_Name, Email
+
+Phone_Supplier:
+(Supplier_ID, Phone) -> none
+
+PurchaseOrder:
+PO_ID -> Supplier_ID, Created_By_Admin_ID, Status, Order_Date
+
+PurchaseOrderItem:
+(PO_ID, Product_Variant_ID) -> Quantity_Ordered, Unit_Cost
+
+GoodsReceipt:
+Receipt_ID -> PO_ID, Warehouse_ID, Receipt_Date
+
+GoodsReceiptItem:
+(Receipt_ID, Product_Variant_ID) -> Quantity_Received, Unit_Cost
+
+
+3. NORMAL FORM JUDGMENT
+-----------------------
+
+FIRST NORMAL FORM (1NF):
+- All attributes are atomic
+- No repeating groups
+Result: All relations are in 1NF
+
+SECOND NORMAL FORM (2NF):
+- No partial dependency on composite keys
+Result: All relations are in 2NF
+
+THIRD NORMAL FORM (3NF):
+- No transitive dependency
+- All non-key attributes depend only on candidate keys
+Result: All relations are in 3NF
+
+
+4. REQUIRED DECOMPOSITION
+-------------------------
+No decomposition is required.
+The schema already satisfies 3NF.
+
+
+5. FINAL CONCLUSION
+--------------------
+The given STORE_DB schema is fully normalized up to Third Normal Form (3NF).
+It avoids redundancy, update anomalies, and dependency violations.

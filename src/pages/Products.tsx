@@ -1,138 +1,199 @@
-import { useState } from 'react';
-import { Package, ChevronDown, ChevronRight } from 'lucide-react';
+// VERIFICATION: I AM EDITING THIS FILE
+import { useState, useEffect, useCallback } from 'react';
+import { Package, Loader2, AlertCircle } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
-import { products, productVariants } from '@/data/mockData';
-import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
+import { ProductFilters } from '@/components/ProductFilters';
+import {
+  fetchFilteredProducts,
+  fetchBrands,
+  fetchCategories,
+  ProductFilters as Filters,
+  FilteredProduct,
+  Brand,
+  Category,
+} from '@/lib/api';
 
 export default function Products() {
-  const [expandedProducts, setExpandedProducts] = useState<Set<string>>(new Set());
+  const [products, setProducts] = useState<FilteredProduct[]>([]);
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [filters, setFilters] = useState<Filters>({});
 
-  const toggleProduct = (productId: string) => {
-    const newExpanded = new Set(expandedProducts);
-    if (newExpanded.has(productId)) {
-      newExpanded.delete(productId);
-    } else {
-      newExpanded.add(productId);
-    }
-    setExpandedProducts(newExpanded);
-  };
+  // Fetch brands and categories on mount
+  useEffect(() => {
+    const fetchMetadata = async () => {
+      try {
+        const [brandsData, categoriesData] = await Promise.all([
+          fetchBrands(),
+          fetchCategories(),
+        ]);
+        setBrands(brandsData);
+        setCategories(categoriesData);
+      } catch (err) {
+        console.error('Failed to fetch metadata:', err);
+      }
+    };
+    fetchMetadata();
+  }, []);
 
-  const getVariantsForProduct = (productId: string) => {
-    return productVariants.filter((v) => v.productId === productId);
-  };
+  // Fetch products when filters change
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await fetchFilteredProducts(filters);
+        setProducts(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load products');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [filters]);
+
+  const handleFilterChange = useCallback((newFilters: Filters) => {
+    setFilters(newFilters);
+  }, []);
 
   return (
     <div>
       <PageHeader
         title="Products"
-        description="View and manage products and their variants"
+        description="View and manage products with advanced filtering"
       />
 
-      <div className="bg-card border border-border rounded-lg overflow-hidden">
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th className="w-8"></th>
-              <th>Product Name</th>
-              <th>SKU</th>
-              <th>Category</th>
-              <th>Variants</th>
-              <th>Created</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((product) => {
-              const variants = getVariantsForProduct(product.id);
-              const isExpanded = expandedProducts.has(product.id);
+      <ProductFilters
+        onFilterChange={handleFilterChange}
+        brands={brands}
+        categories={categories}
+      />
 
-              return (
-                <>
-                  <tr
-                    key={product.id}
-                    className="cursor-pointer"
-                    onClick={() => toggleProduct(product.id)}
-                  >
-                    <td>
-                      <button className="p-1 hover:bg-muted rounded">
-                        {isExpanded ? (
-                          <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                        ) : (
-                          <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                        )}
-                      </button>
-                    </td>
+      {/* Loading State */}
+      {loading && (
+        <div className="flex items-center justify-center py-12 bg-card border border-border rounded-lg">
+          <div className="text-center">
+            <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-2" />
+            <p className="text-sm text-muted-foreground">Loading products...</p>
+          </div>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && !loading && (
+        <div className="flex items-center justify-center py-12 bg-card border border-border rounded-lg">
+          <div className="text-center">
+            <AlertCircle className="w-8 h-8 text-destructive mx-auto mb-2" />
+            <p className="text-sm text-foreground font-medium mb-1">Failed to load products</p>
+            <p className="text-sm text-muted-foreground">{error}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Products Table */}
+      {!loading && !error && (
+        <div className="bg-card border border-border rounded-lg overflow-hidden">
+          {products.length === 0 ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="text-center">
+                <Package className="w-12 h-12 text-muted-foreground mx-auto mb-3 opacity-50" />
+                <p className="text-sm text-muted-foreground">No products found</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Try adjusting your filters
+                </p>
+              </div>
+            </div>
+          ) : (
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Product Name</th>
+                  <th>Brand</th>
+                  <th>Category</th>
+                  <th>Price Range</th>
+                  <th>Stock</th>
+                  <th>Variants</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {products.map((product) => (
+                  <tr key={product.Product_ID}>
                     <td>
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
                           <Package className="w-5 h-5 text-muted-foreground" />
                         </div>
                         <div>
-                          <p className="font-medium text-foreground">{product.name}</p>
-                          {product.description && (
+                          <p className="font-medium text-foreground">{product.Product_Name}</p>
+                          {product.Description && (
                             <p className="text-sm text-muted-foreground line-clamp-1">
-                              {product.description}
+                              {product.Description}
                             </p>
                           )}
                         </div>
                       </div>
                     </td>
                     <td>
-                      <code className="text-sm bg-muted px-2 py-1 rounded">{product.sku}</code>
-                    </td>
-                    <td>
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground">
-                        {product.category}
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                        {product.Brand_Name}
                       </span>
                     </td>
-                    <td>{variants.length}</td>
-                    <td className="text-muted-foreground">
-                      {format(product.createdAt, 'MMM d, yyyy')}
+                    <td>
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                        {product.Category_Name}
+                      </span>
+                    </td>
+                    <td className="font-medium text-foreground">
+                      {product.Min_Price === product.Max_Price ? (
+                        <span>${product.Min_Price.toFixed(2)}</span>
+                      ) : (
+                        <span>
+                          ${product.Min_Price.toFixed(2)} - ${product.Max_Price.toFixed(2)}
+                        </span>
+                      )}
+                    </td>
+                    <td>
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${product.Total_Stock > 50
+                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                          : product.Total_Stock > 20
+                            ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                          }`}
+                      >
+                        {product.Total_Stock} units
+                      </span>
+                    </td>
+                    <td className="text-muted-foreground">{product.Variant_Count}</td>
+                    <td>
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${product.Visibility === 'ACTIVE'
+                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                          : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200'
+                          }`}
+                      >
+                        {product.Visibility}
+                      </span>
                     </td>
                   </tr>
-                  {isExpanded &&
-                    variants.map((variant, index) => (
-                      <tr
-                        key={variant.id}
-                        className={cn(
-                          'bg-muted/30',
-                          index === variants.length - 1 && 'border-b-2 border-border'
-                        )}
-                      >
-                        <td></td>
-                        <td className="pl-16">
-                          <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full bg-primary/50"></div>
-                            <span className="text-foreground">{variant.name}</span>
-                          </div>
-                        </td>
-                        <td>
-                          <code className="text-sm bg-muted px-2 py-1 rounded">
-                            {variant.sku}
-                          </code>
-                        </td>
-                        <td>
-                          {Object.entries(variant.attributes).map(([key, value]) => (
-                            <span
-                              key={key}
-                              className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-accent text-accent-foreground mr-1"
-                            >
-                              {key}: {value}
-                            </span>
-                          ))}
-                        </td>
-                        <td className="font-medium text-foreground">
-                          ${variant.price.toFixed(2)}
-                        </td>
-                        <td></td>
-                      </tr>
-                    ))}
-                </>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      )}
+
+      {/* Results Count */}
+      {!loading && !error && products.length > 0 && (
+        <div className="mt-4 text-sm text-muted-foreground text-center">
+          Showing {products.length} product{products.length !== 1 ? 's' : ''}
+        </div>
+      )}
     </div>
   );
 }

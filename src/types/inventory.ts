@@ -87,7 +87,7 @@ export interface InventoryItem {
   quantity: number; // Derived from StockMovement
 }
 
-export type StockMovementType = 'GOODS_RECEIPT' | 'ADJUSTMENT' | 'TRANSFER_IN' | 'TRANSFER_OUT' | 'RETURN';
+export type StockMovementType = 'INBOUND' | 'SALE' | 'RETURN' | 'ADJUSTMENT' | 'TRANSFER_IN' | 'TRANSFER_OUT';
 
 export interface StockMovement {
   id: string;

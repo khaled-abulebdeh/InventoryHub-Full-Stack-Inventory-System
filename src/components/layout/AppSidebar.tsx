@@ -14,13 +14,13 @@ import { cn } from '@/lib/utils';
 import { useState } from 'react';
 
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { name: 'Products', href: '/products', icon: Package },
-  { name: 'Suppliers', href: '/suppliers', icon: Truck },
-  { name: 'Purchase Orders', href: '/purchase-orders', icon: ClipboardList },
-  { name: 'Goods Receipts', href: '/goods-receipts', icon: PackageCheck },
-  { name: 'Inventory', href: '/inventory', icon: Warehouse },
-  { name: 'Stock Movements', href: '/stock-movements', icon: ArrowLeftRight },
+  { name: 'Dashboard', href: '/app', icon: LayoutDashboard },
+  { name: 'Products', href: '/app/products', icon: Package },
+  { name: 'Suppliers', href: '/app/suppliers', icon: Truck },
+  { name: 'Purchase Orders', href: '/app/purchase-orders', icon: ClipboardList },
+  { name: 'Goods Receipts', href: '/app/goods-receipts', icon: PackageCheck },
+  { name: 'Inventory', href: '/app/inventory', icon: Warehouse },
+  { name: 'Stock Movements', href: '/app/stock-movements', icon: ArrowLeftRight },
 ];
 
 export function AppSidebar() {
