@@ -124,12 +124,5 @@ The system is built using a **modern React frontend**, a **Flask REST API backen
 
 ---
 
-## Future Enhancements
-- Role-based access control
-- Demand forecasting
-- Supplier performance analytics
-- Barcode / QR integration
-- Deployment with Docker
 
----
 
