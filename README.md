@@ -1,73 +1,135 @@
-# Welcome to your Lovable project
+# InventoryHub – Multi-Warehouse Inventory Management System
 
-## Project info
+## Overview
+InventoryHub is a **web-based inventory management system** designed to manage products,
+suppliers, warehouses, and customer orders in a unified platform.  
+It provides real-time visibility into stock levels, supports multi-warehouse operations,
+and tracks inventory movement across procurement and sales workflows.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+The system is built using a **modern React frontend**, a **Flask REST API backend**, and a
+**relational MySQL database**.
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## Core Capabilities
+- Multi-warehouse inventory tracking
+- Product and variant management (SKU-based)
+- Supplier and procurement workflows
+- Customer orders and fulfillment
+- Stock movement auditing
+- Inventory analytics and dashboards
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## Technology Stack
 
-Changes made via Lovable will be committed automatically to this repo.
+### Frontend
+- **React 18** (TypeScript)
+- **Vite** (build tool)
+- **Tailwind CSS** + **shadcn/ui**
+- **React Router v6**
+- **React Query (@tanstack/react-query)**
+- **React Hook Form + Zod**
+- **Recharts** (analytics & charts)
+- **Axios**
+- **Lucide React** (icons)
 
-**Use your preferred IDE**
+### Backend
+- **Python Flask**
+- RESTful API architecture
+- MVC-style layering:
+  - Controllers
+  - Services
+  - Repositories
+- **Flask Blueprints** for modular routing
+- **CORS** enabled for frontend integration
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Database
+- **MySQL**
+- Normalized schema (3NF)
+- Trigger-based stock updates
+- Bridge tables for complex relationships
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+---
 
-Follow these steps:
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+---
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## Domain Model (High Level)
 
-# Step 3: Install the necessary dependencies.
-npm i
+### Product & Inventory
+- Product
+- ProductVariant (SKU-level)
+- Category (hierarchical)
+- Warehouse
+- Inventory (variant × warehouse)
+- StockMovement (audit trail)
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+### Procurement
+- Supplier
+- SupplierProductVariant
+- PurchaseOrder
+- GoodsReceipt
 
-**Edit a file directly in GitHub**
+### Sales
+- Customer
+- Order
+- Bill
+- Payment
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+---
 
-**Use GitHub Codespaces**
+## Key Workflows
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Inventory Management
+- Track stock per warehouse and product variant
+- Automatic stock updates via receipts, transfers, and sales
+- Low-stock monitoring using reorder levels
 
-## What technologies are used for this project?
+### Procurement
+- Create purchase orders for suppliers
+- Receive goods via goods receipts
+- Inventory automatically increases on receipt
 
-This project is built with:
+### Sales & Fulfillment
+- Customer order placement
+- Stock deduction on shipment
+- Supports COD lifecycle (Delivered, Returned, Restocked)
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Supplier Management
+- Multiple suppliers per product
+- Cost comparison
+- Preferred supplier selection
 
-## How can I deploy this project?
+---
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+## Analytics Dashboard
+- Inventory value overview
+- Stock distribution across warehouses
+- Recent stock movements
+- Operational insights via interactive charts
 
-## Can I connect a custom domain to my Lovable project?
+---
 
-Yes, you can!
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+---
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## Key Concepts Demonstrated
+- Full-stack system design
+- REST API development
+- Relational database modeling
+- Inventory consistency & auditability
+- Separation of concerns (MVC)
+- Scalable frontend architecture
+
+---
+
+## Future Enhancements
+- Role-based access control
+- Demand forecasting
+- Supplier performance analytics
+- Barcode / QR integration
+- Deployment with Docker
+
+---
+
